@@ -57,31 +57,45 @@ export default class Board extends React.Component {
   }
 
   componentDidMount() {
-    Dragula([this.swimlanes.backlog.current, this.swimlanes.inProgress.current, this.swimlanes.complete.current], {
+    this.dragular = Dragula([this.swimlanes.backlog.current, this.swimlanes.inProgress.current, this.swimlanes.complete.current], {
       removeOnSpill: true,
       accepts: (el, target, source, sibling) => {
         return true;
       },
-    }).on('drop', (el, target, source) => {
-      if (target !== source) {
-        switch(target.parentElement.firstChild.innerHTML){
-          default: 
-            console.log(null);
-            break;
-          case "Complete":
-            el.dataset.status = 'complete';
-            el.className = 'Card Card-green';
-          break;
-          case "In Progress":
-          el.dataset.status = 'in-progress';
-          el.className = 'Card Card-blue';
-          break;
-          case "Backlog":
-          el.dataset.status = 'backlog';
-          el.className = 'Card Card-grey';
-        }
+    });
+    this.dragular.on('drop', (el, target, source) => {
+      if (target !== source){
+        this.updateClients(el, target);
       }
     });
+  }
+
+  updateClients(el, target) {
+    this.dragular.cancel(true);
+    const clientList = this.state.clients.backlog.concat(this.state.clients.inProgress, this.state.clients.complete);
+    let destination = 'backlog';
+    if (this.swimlanes.inProgress.current === target){
+      destination = 'in-progress';
+    } else if (this.swimlanes.complete.current === target) {
+      destination = 'complete';
+    }
+    const clientSelected = clientList.find(client => client.id === el.dataset.id);
+    const clientListUpdated =  clientList.filter(client => client.id !== el.dataset.id);
+    const clientUpdated = {
+      id: clientSelected.id,
+      name: clientSelected.name,
+      description: clientSelected.description,
+      status: destination,
+    }
+    clientListUpdated.push(clientUpdated);
+    this.setState({
+      clients: {
+        backlog: clientListUpdated.filter(client => !client.status || client.status === 'backlog'),
+        inProgress: clientListUpdated.filter(client => client.status && client.status === 'in-progress'),
+        complete: clientListUpdated.filter(client => client.status && client.status === 'complete'),
+      }
+    })
+
   }
 
   render() {
