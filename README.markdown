@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://cdn4.iconfinder.com/data/icons/ikooni-outline-seo-web/128/seo-12-512.png"></a>
+<img src="https://cdn4.iconfinder.com/data/icons/ikooni-outline-seo-web/128/seo-12-512.png">
 <br><br>
            
 </p>
